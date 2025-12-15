@@ -368,6 +368,184 @@
             font-weight: bold;
         }
 
+        /* 要因トラッキング */
+        .factor-section {
+            background: #f8f9ff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .factor-section h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .factor-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .factor-item {
+            padding: 12px 8px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+        }
+
+        .factor-item:hover {
+            border-color: #4ECDC4;
+            background: #f0fffd;
+        }
+
+        .factor-item.selected {
+            border-color: #4ECDC4;
+            background: #e0f7f5;
+        }
+
+        .factor-item.negative.selected {
+            border-color: #FF6B6B;
+            background: #ffe8e8;
+        }
+
+        .factor-item .icon {
+            font-size: 1.3rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        /* 感謝セクション */
+        .gratitude-section {
+            background: linear-gradient(135deg, #fff9e6 0%, #fff3cd 100%);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .gratitude-section h4 {
+            color: #f5a623;
+            margin-bottom: 15px;
+        }
+
+        .gratitude-input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #f5d78e;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            background: white;
+        }
+
+        .gratitude-input:focus {
+            outline: none;
+            border-color: #f5a623;
+        }
+
+        /* フィードバックエリア */
+        .mood-feedback {
+            background: linear-gradient(135deg, #f0fffd 0%, #e8f8f5 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+
+        .mood-feedback.show {
+            display: block;
+        }
+
+        .mood-feedback h4 {
+            color: #44A08D;
+            margin-bottom: 15px;
+        }
+
+        .action-suggestion {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 4px solid #4ECDC4;
+        }
+
+        .action-suggestion.warning {
+            border-left-color: #FF6B6B;
+            background: #fff5f5;
+        }
+
+        .action-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* パターン分析 */
+        .pattern-section {
+            background: #f8f9ff;
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .pattern-section h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .pattern-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .pattern-item .icon {
+            font-size: 1.5rem;
+        }
+
+        .pattern-item .text {
+            flex: 1;
+            color: #333;
+            font-size: 0.9rem;
+        }
+
+        .pattern-item .badge {
+            background: #4ECDC4;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .pattern-item .badge.negative {
+            background: #FF6B6B;
+        }
+
+        @media (max-width: 500px) {
+            .factor-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         /* チャート */
         .chart-container {
             background: #f8f9ff;
@@ -783,8 +961,54 @@
                     </div>
                 </div>
 
-                <textarea class="textarea" id="mood-note" placeholder="一言メモ（任意）"></textarea>
+                <!-- 要因トラッキング -->
+                <div class="factor-section">
+                    <h4>📋 今日の状態（複数選択可）</h4>
+                    <div class="factor-grid">
+                        <div class="factor-item" onclick="toggleFactor(this, 'sleep_good')" data-factor="sleep_good">
+                            <span class="icon">😴</span>よく寝た
+                        </div>
+                        <div class="factor-item" onclick="toggleFactor(this, 'exercise')" data-factor="exercise">
+                            <span class="icon">🏃</span>運動した
+                        </div>
+                        <div class="factor-item" onclick="toggleFactor(this, 'outdoor')" data-factor="outdoor">
+                            <span class="icon">🌞</span>外出した
+                        </div>
+                        <div class="factor-item" onclick="toggleFactor(this, 'social')" data-factor="social">
+                            <span class="icon">👥</span>人と会った
+                        </div>
+                        <div class="factor-item" onclick="toggleFactor(this, 'progress')" data-factor="progress">
+                            <span class="icon">📈</span>仕事進んだ
+                        </div>
+                        <div class="factor-item" onclick="toggleFactor(this, 'relax')" data-factor="relax">
+                            <span class="icon">🛋️</span>休息とれた
+                        </div>
+                        <div class="factor-item negative" onclick="toggleFactor(this, 'sleep_bad')" data-factor="sleep_bad">
+                            <span class="icon">😵</span>寝不足
+                        </div>
+                        <div class="factor-item negative" onclick="toggleFactor(this, 'stress')" data-factor="stress">
+                            <span class="icon">😰</span>ストレス
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 感謝の記録 -->
+                <div class="gratitude-section">
+                    <h4>✨ 今日良かったこと（任意）</h4>
+                    <input type="text" class="gratitude-input" id="gratitude-input" placeholder="例: 美味しいコーヒーが飲めた">
+                </div>
+
+                <textarea class="textarea" id="mood-note" placeholder="一言メモ（任意）" style="margin-bottom: 15px;"></textarea>
                 <button class="btn btn-full" onclick="saveMood()">記録する</button>
+
+                <!-- 即時フィードバック -->
+                <div class="mood-feedback" id="mood-feedback"></div>
+
+                <!-- パターン分析 -->
+                <div class="pattern-section" id="pattern-section" style="display: none;">
+                    <h4>🔍 あなたのパターン分析</h4>
+                    <div id="pattern-results"></div>
+                </div>
 
                 <div class="chart-container" id="mood-chart-container" style="display: none;">
                     <h4>📈 過去7日間の気分推移</h4>
@@ -1129,10 +1353,21 @@
         }
 
         // ==================== 気分記録 ====================
+        let selectedFactors = [];
+
         function selectMood(element, value) {
             document.querySelectorAll('.mood-item').forEach(item => item.classList.remove('selected'));
             element.classList.add('selected');
             selectedMoodValue = value;
+        }
+
+        function toggleFactor(element, factor) {
+            element.classList.toggle('selected');
+            if (selectedFactors.includes(factor)) {
+                selectedFactors = selectedFactors.filter(f => f !== factor);
+            } else {
+                selectedFactors.push(factor);
+            }
         }
 
         function saveMood() {
@@ -1141,11 +1376,16 @@
                 return;
             }
 
+            const gratitude = document.getElementById('gratitude-input').value.trim();
+            const note = document.getElementById('mood-note').value.trim();
+
             const entry = {
                 date: new Date().toLocaleDateString('ja-JP'),
                 time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
                 mood: selectedMoodValue,
-                note: document.getElementById('mood-note').value
+                factors: [...selectedFactors],
+                gratitude: gratitude,
+                note: note
             };
 
             moodHistory.unshift(entry);
@@ -1153,12 +1393,249 @@
 
             localStorage.setItem('mentalcare_mood', JSON.stringify(moodHistory));
 
+            // 即時フィードバックを表示
+            showMoodFeedback(selectedMoodValue, selectedFactors);
+
+            // パターン分析を更新
+            analyzePatterns();
+
+            // 入力をリセット
             document.getElementById('mood-note').value = '';
+            document.getElementById('gratitude-input').value = '';
             document.querySelectorAll('.mood-item').forEach(item => item.classList.remove('selected'));
+            document.querySelectorAll('.factor-item').forEach(item => item.classList.remove('selected'));
             selectedMoodValue = null;
+            selectedFactors = [];
 
             displayMoodChart();
-            alert('記録しました！');
+        }
+
+        function showMoodFeedback(mood, factors) {
+            const feedbackArea = document.getElementById('mood-feedback');
+            let html = '';
+
+            const moodLabels = {
+                5: 'とても良い',
+                4: '良い',
+                3: '普通',
+                2: '不安',
+                1: 'つらい',
+                0: 'イライラ'
+            };
+
+            // 気分に応じたメッセージ
+            if (mood >= 4) {
+                html += `
+                    <h4>🎉 素晴らしい！</h4>
+                    <p>今日は気分が「${moodLabels[mood]}」ですね！</p>
+                `;
+
+                // ポジティブ要因を強調
+                if (factors.length > 0) {
+                    const positiveFactors = factors.filter(f => !['sleep_bad', 'stress'].includes(f));
+                    if (positiveFactors.length > 0) {
+                        html += `<div class="action-suggestion">
+                            <strong>💡 今日の良い習慣を続けましょう！</strong>
+                            <p style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+                                ${getFactorLabels(positiveFactors).join('、')}が気分の良さに貢献しているかもしれません。
+                            </p>
+                        </div>`;
+                    }
+                }
+            } else if (mood === 3) {
+                html += `
+                    <h4>📝 記録ありがとうございます</h4>
+                    <p>「普通」の日も大切な記録です。</p>
+                    <div class="action-suggestion">
+                        <strong>💡 ちょっとした変化を試してみませんか？</strong>
+                        <p style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+                            5分の散歩や深呼吸で、気分が上向くことがあります。
+                        </p>
+                    </div>
+                `;
+            } else {
+                // mood <= 2 (つらい、不安、イライラ)
+                html += `
+                    <h4>💚 辛い時に記録できた自分を褒めましょう</h4>
+                    <p>今日は気分が「${moodLabels[mood]}」なんですね。それを認識できていることが大事です。</p>
+                `;
+
+                // ネガティブ要因へのアドバイス
+                if (factors.includes('sleep_bad')) {
+                    html += `<div class="action-suggestion warning">
+                        <strong>😴 睡眠不足が影響しているかも</strong>
+                        <p style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+                            今夜は早めに寝ることを最優先にしてみませんか？睡眠は気分に大きく影響します。
+                        </p>
+                    </div>`;
+                }
+
+                if (factors.includes('stress')) {
+                    html += `<div class="action-suggestion warning">
+                        <strong>😰 ストレスを感じていますね</strong>
+                        <p style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+                            呼吸エクササイズを試してみませんか？
+                        </p>
+                        <button class="action-btn" onclick="showTab('breathing'); document.querySelector('.tab-btn').click();">
+                            🌬️ 呼吸エクササイズへ
+                        </button>
+                    </div>`;
+                }
+
+                // 運動・外出していない場合の提案
+                if (!factors.includes('exercise') && !factors.includes('outdoor')) {
+                    html += `<div class="action-suggestion">
+                        <strong>🚶 少し体を動かしてみませんか？</strong>
+                        <p style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+                            5分の散歩でも気分が変わることがあります。無理のない範囲で試してみてください。
+                        </p>
+                    </div>`;
+                }
+
+                // 誰とも会っていない場合
+                if (!factors.includes('social')) {
+                    html += `<div class="action-suggestion">
+                        <strong>👋 誰かと話してみませんか？</strong>
+                        <p style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+                            家族、友人、またはオンラインコミュニティでの短い会話でも心が軽くなることがあります。
+                        </p>
+                    </div>`;
+                }
+
+                // 深刻な場合の注意喚起
+                if (mood <= 1) {
+                    html += `<div class="action-suggestion warning" style="margin-top: 20px;">
+                        <strong>🆘 辛い時は助けを求めてOKです</strong>
+                        <p style="margin-top: 8px; color: #666; font-size: 0.9rem;">
+                            この状態が続く場合は、専門家に相談することをお勧めします。
+                            「情報」タブに相談先があります。
+                        </p>
+                    </div>`;
+                }
+            }
+
+            feedbackArea.innerHTML = html;
+            feedbackArea.classList.add('show');
+        }
+
+        function getFactorLabels(factors) {
+            const labels = {
+                'sleep_good': '良い睡眠',
+                'exercise': '運動',
+                'outdoor': '外出',
+                'social': '人との交流',
+                'progress': '仕事の進捗',
+                'relax': '休息',
+                'sleep_bad': '睡眠不足',
+                'stress': 'ストレス'
+            };
+            return factors.map(f => labels[f] || f);
+        }
+
+        function analyzePatterns() {
+            const section = document.getElementById('pattern-section');
+            const results = document.getElementById('pattern-results');
+
+            if (moodHistory.length < 5) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+
+            // 要因ごとの気分平均を計算
+            const factorStats = {};
+            const factorCounts = {};
+
+            moodHistory.forEach(entry => {
+                if (entry.factors && entry.factors.length > 0) {
+                    entry.factors.forEach(factor => {
+                        if (!factorStats[factor]) {
+                            factorStats[factor] = 0;
+                            factorCounts[factor] = 0;
+                        }
+                        factorStats[factor] += entry.mood;
+                        factorCounts[factor]++;
+                    });
+                }
+            });
+
+            // 平均を計算
+            const factorAverages = {};
+            for (const factor in factorStats) {
+                if (factorCounts[factor] >= 2) {
+                    factorAverages[factor] = factorStats[factor] / factorCounts[factor];
+                }
+            }
+
+            // パターンを生成
+            const patterns = [];
+            const overallAvg = moodHistory.reduce((sum, e) => sum + e.mood, 0) / moodHistory.length;
+
+            for (const factor in factorAverages) {
+                const avg = factorAverages[factor];
+                const diff = avg - overallAvg;
+                const count = factorCounts[factor];
+
+                if (Math.abs(diff) >= 0.5 && count >= 2) {
+                    patterns.push({
+                        factor: factor,
+                        avg: avg,
+                        diff: diff,
+                        count: count,
+                        positive: diff > 0
+                    });
+                }
+            }
+
+            // 差が大きい順にソート
+            patterns.sort((a, b) => Math.abs(b.diff) - Math.abs(a.diff));
+
+            if (patterns.length === 0) {
+                results.innerHTML = `
+                    <div class="pattern-item">
+                        <span class="icon">📊</span>
+                        <span class="text">もう少しデータが集まるとパターンが見えてきます</span>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            patterns.slice(0, 5).forEach(p => {
+                const label = getFactorLabels([p.factor])[0];
+                const icon = p.positive ? '📈' : '📉';
+                const message = p.positive
+                    ? `「${label}」がある日は気分が良い傾向`
+                    : `「${label}」がある日は気分が下がる傾向`;
+                const badge = p.positive ? '効果あり' : '要注意';
+                const badgeClass = p.positive ? '' : 'negative';
+
+                html += `
+                    <div class="pattern-item">
+                        <span class="icon">${icon}</span>
+                        <span class="text">${message}</span>
+                        <span class="badge ${badgeClass}">${badge}</span>
+                    </div>
+                `;
+            });
+
+            // 感謝記録の効果
+            const withGratitude = moodHistory.filter(e => e.gratitude && e.gratitude.length > 0);
+            if (withGratitude.length >= 3) {
+                const gratitudeAvg = withGratitude.reduce((sum, e) => sum + e.mood, 0) / withGratitude.length;
+                if (gratitudeAvg > overallAvg + 0.3) {
+                    html += `
+                        <div class="pattern-item">
+                            <span class="icon">✨</span>
+                            <span class="text">感謝を記録した日は気分が良い傾向</span>
+                            <span class="badge">効果あり</span>
+                        </div>
+                    `;
+                }
+            }
+
+            results.innerHTML = html;
         }
 
         function displayMoodChart() {
@@ -1322,6 +1799,7 @@
             if (savedMood) {
                 moodHistory = JSON.parse(savedMood);
                 displayMoodChart();
+                analyzePatterns();
             }
         }
     </script>
