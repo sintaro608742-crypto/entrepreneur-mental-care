@@ -4,33 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>起業家メンタルケア | 心のセルフケアツール</title>
+    <!-- アクセスキー機能（現在無効化中。必要時に復活可能）
     <script>
-        // =============================================
-        // アクセスキー設定（ここを編集して管理）
-        // =============================================
         const validKeys = {
             "demo": { expires: "2099-12-31", name: "デモ用（無期限）" },
-            "1215session": { expires: "2024-12-22", name: "12/15説明会" },
-            "1220session": { expires: "2024-12-27", name: "12/20説明会" },
+            "1215session": { expires: "2025-12-22", name: "12/15説明会" },
         };
-        // =============================================
-
         function checkAccess() {
             const urlParams = new URLSearchParams(window.location.search);
             const key = urlParams.get('key');
-            if (!key || !validKeys[key]) {
-                return { valid: false, reason: 'invalid_key' };
-            }
+            if (!key || !validKeys[key]) return { valid: false, reason: 'invalid_key' };
             const keyData = validKeys[key];
             const today = new Date();
             const expireDate = new Date(keyData.expires + 'T23:59:59');
-            if (today > expireDate) {
-                return { valid: false, reason: 'expired', expireDate: keyData.expires };
-            }
+            if (today > expireDate) return { valid: false, reason: 'expired', expireDate: keyData.expires };
             return { valid: true, keyData };
         }
         const accessResult = checkAccess();
     </script>
+    -->
     <style>
         * {
             margin: 0;
@@ -86,11 +78,11 @@
         }
 
         .main-content {
-            display: none;
+            display: block;
         }
 
-        .main-content.show {
-            display: block;
+        .access-denied {
+            display: none !important;
         }
 
         .logo {
@@ -655,28 +647,9 @@
     </div>
 
     <script>
-        // アクセス制御
+        // 初期化
         (function() {
-            const denied = document.getElementById('access-denied');
-            const main = document.getElementById('main-content');
-            const title = document.getElementById('denied-title');
-            const message = document.getElementById('denied-message');
-
-            if (!accessResult.valid) {
-                denied.classList.add('show');
-                main.classList.remove('show');
-                if (accessResult.reason === 'expired') {
-                    title.textContent = '有効期限が切れています';
-                    message.textContent = `このページの有効期限は ${accessResult.expireDate} で終了しました。`;
-                } else {
-                    title.textContent = 'アクセスキーが無効です';
-                    message.textContent = '正しいURLで再度アクセスしてください。';
-                }
-            } else {
-                denied.classList.remove('show');
-                main.classList.add('show');
-                loadHistory();
-            }
+            loadHistory();
         })();
 
         // 気分に応じたレスポンス
