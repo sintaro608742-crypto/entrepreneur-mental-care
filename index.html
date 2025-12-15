@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>起業家メンタルケア | 心のセルフケアツール</title>
+    <script>
+        // =============================================
+        // アクセスキー設定（ここを編集して管理）
+        // =============================================
+        const validKeys = {
+            "demo": { expires: "2099-12-31", name: "デモ用（無期限）" },
+            "1215session": { expires: "2024-12-22", name: "12/15説明会" },
+            "1220session": { expires: "2024-12-27", name: "12/20説明会" },
+        };
+        // =============================================
+
+        function checkAccess() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const key = urlParams.get('key');
+            if (!key || !validKeys[key]) {
+                return { valid: false, reason: 'invalid_key' };
+            }
+            const keyData = validKeys[key];
+            const today = new Date();
+            const expireDate = new Date(keyData.expires + 'T23:59:59');
+            if (today > expireDate) {
+                return { valid: false, reason: 'expired', expireDate: keyData.expires };
+            }
+            return { valid: true, keyData };
+        }
+        const accessResult = checkAccess();
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', Meiryo, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 680px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 24px;
+            padding: 35px;
+            box-shadow: 0 25px 80px rgba(0,0,0,0.4);
+            margin-top: 20px;
+        }
+
+        /* アクセス制限画面 */
+        .access-denied {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .access-denied.show {
+            display: block;
+        }
+
+        .access-denied .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+        }
+
+        .access-denied h2 {
+            color: #e94560;
+            margin-bottom: 15px;
+        }
+
+        .access-denied p {
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .main-content {
+            display: none;
+        }
+
+        .main-content.show {
+            display: block;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .logo-text {
+            font-size: 0.85rem;
+            color: #4ECDC4;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        h1 {
+            text-align: center;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+
+        /* タブナビゲーション */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 15px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #e0e0e0;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 気分チェック */
+        .mood-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .mood-item {
+            padding: 20px 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mood-item:hover {
+            border-color: #4ECDC4;
+            background: #f0fffd;
+        }
+
+        .mood-item.selected {
+            border-color: #4ECDC4;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+        }
+
+        .mood-item .emoji {
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+        }
+
+        .mood-item .label {
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+
+        /* 不安入力 */
+        .worry-input {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            margin-bottom: 15px;
+        }
+
+        .worry-input:focus {
+            outline: none;
+            border-color: #4ECDC4;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4ECDC4;
+            border: 2px solid #4ECDC4;
+        }
+
+        .btn-secondary:hover {
+            background: #f0fffd;
+            box-shadow: none;
+            transform: none;
+        }
+
+        /* レスポンスエリア */
+        .response-area {
+            background: linear-gradient(135deg, #f0fffd 0%, #e8f8f5 100%);
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .response-area.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+
+        .response-area h3 {
+            color: #44A08D;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .response-area p {
+            line-height: 1.9;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        .response-area ul {
+            padding-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .response-area li {
+            margin-bottom: 10px;
+            line-height: 1.7;
+        }
+
+        /* 認知の歪み */
+        .distortion-box {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #FF6B6B;
+        }
+
+        .distortion-box h4 {
+            color: #FF6B6B;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .distortion-box p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        .reframe-box {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            border-left: 4px solid #4ECDC4;
+        }
+
+        .reframe-box h4 {
+            color: #44A08D;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+
+        .reframe-box p {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 0;
+        }
+
+        /* デイリーチェックイン */
+        .checkin-item {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .checkin-item h4 {
+            color: #333;
+            margin-bottom: 12px;
+            font-size: 1rem;
+        }
+
+        .slider-container {
+            margin-bottom: 10px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: #e0e0e0;
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4ECDC4 0%, #44A08D 100%);
+            cursor: pointer;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #999;
+        }
+
+        .slider-value {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #44A08D;
+            margin-top: 5px;
+        }
+
+        /* 履歴 */
+        .history-item {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .history-item .date {
+            font-size: 0.8rem;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .history-item .mood {
+            font-size: 1.5rem;
+            margin-right: 10px;
+        }
+
+        .history-item .note {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* ガイドセクション */
+        .guide-section {
+            background: #fff5f5;
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 20px;
+        }
+
+        .guide-section h3 {
+            color: #FF6B6B;
+            margin-bottom: 15px;
+        }
+
+        .warning-signs {
+            list-style: none;
+            padding: 0;
+        }
+
+        .warning-signs li {
+            padding: 12px 15px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-signs li .icon {
+            font-size: 1.2rem;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 500px) {
+            .card {
+                padding: 25px 20px;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .mood-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tab-btn {
+                padding: 10px 8px;
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <!-- アクセス制限画面 -->
+            <div class="access-denied" id="access-denied">
+                <div class="icon">🔒</div>
+                <h2 id="denied-title">アクセスできません</h2>
+                <p id="denied-message">このページへのアクセス権限がないか、有効期限が切れています。</p>
+                <p style="font-size: 0.85rem; color: #999; margin-top: 15px;">説明会参加者の方は、配布されたURLをご確認ください。</p>
+            </div>
+
+            <!-- メインコンテンツ -->
+            <div class="main-content" id="main-content">
+                <div class="logo">
+                    <span class="logo-text">ENTREPRENEUR MENTAL CARE</span>
+                </div>
+                <h1>起業家メンタルケア</h1>
+                <p class="subtitle">起業の不安やストレスを<br>セルフケアでサポートします</p>
+
+                <!-- タブナビゲーション -->
+                <div class="tab-nav">
+                    <button class="tab-btn active" onclick="showTab('mood')">😊 気分</button>
+                    <button class="tab-btn" onclick="showTab('worry')">💭 不安</button>
+                    <button class="tab-btn" onclick="showTab('checkin')">📝 記録</button>
+                    <button class="tab-btn" onclick="showTab('guide')">📖 ガイド</button>
+                </div>
+
+                <!-- タブ1: 気分チェック -->
+                <div class="tab-content active" id="tab-mood">
+                    <h3 style="margin-bottom: 20px; color: #333;">今の気分を教えてください</h3>
+
+                    <div class="mood-grid">
+                        <div class="mood-item" onclick="selectMood(this, 'great')">
+                            <div class="emoji">😄</div>
+                            <div class="label">とても良い</div>
+                        </div>
+                        <div class="mood-item" onclick="selectMood(this, 'good')">
+                            <div class="emoji">🙂</div>
+                            <div class="label">良い</div>
+                        </div>
+                        <div class="mood-item" onclick="selectMood(this, 'normal')">
+                            <div class="emoji">😐</div>
+                            <div class="label">普通</div>
+                        </div>
+                        <div class="mood-item" onclick="selectMood(this, 'anxious')">
+                            <div class="emoji">😰</div>
+                            <div class="label">不安</div>
+                        </div>
+                        <div class="mood-item" onclick="selectMood(this, 'tired')">
+                            <div class="emoji">😩</div>
+                            <div class="label">疲れた</div>
+                        </div>
+                        <div class="mood-item" onclick="selectMood(this, 'down')">
+                            <div class="emoji">😢</div>
+                            <div class="label">落ち込み</div>
+                        </div>
+                    </div>
+
+                    <div class="response-area" id="mood-response">
+                        <!-- 気分に応じたレスポンスがここに表示される -->
+                    </div>
+                </div>
+
+                <!-- タブ2: 不安分析 -->
+                <div class="tab-content" id="tab-worry">
+                    <h3 style="margin-bottom: 15px; color: #333;">今の不安や悩みを書き出してみましょう</h3>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 20px;">
+                        書き出すだけで気持ちが整理されます。<br>
+                        AIが認知の歪みを分析し、別の視点を提案します。
+                    </p>
+
+                    <textarea class="worry-input" id="worry-input" placeholder="例：起業したいけど、失敗したらどうしよう。家族に反対されたら...周りの目が気になる..."></textarea>
+
+                    <button class="btn" onclick="analyzeWorry()">🔍 分析する</button>
+
+                    <div class="response-area" id="worry-response">
+                        <!-- 分析結果がここに表示される -->
+                    </div>
+                </div>
+
+                <!-- タブ3: デイリーチェックイン -->
+                <div class="tab-content" id="tab-checkin">
+                    <h3 style="margin-bottom: 20px; color: #333;">今日のコンディションを記録</h3>
+
+                    <div class="checkin-item">
+                        <h4>😊 全体的な気分</h4>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="mood-slider" min="1" max="10" value="5" oninput="updateSlider('mood')">
+                            <div class="slider-labels">
+                                <span>最悪</span>
+                                <span>最高</span>
+                            </div>
+                            <div class="slider-value" id="mood-value">5</div>
+                        </div>
+                    </div>
+
+                    <div class="checkin-item">
+                        <h4>⚡ エネルギーレベル</h4>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="energy-slider" min="1" max="10" value="5" oninput="updateSlider('energy')">
+                            <div class="slider-labels">
+                                <span>疲労困憊</span>
+                                <span>エネルギー満タン</span>
+                            </div>
+                            <div class="slider-value" id="energy-value">5</div>
+                        </div>
+                    </div>
+
+                    <div class="checkin-item">
+                        <h4>😰 不安レベル</h4>
+                        <div class="slider-container">
+                            <input type="range" class="slider" id="anxiety-slider" min="1" max="10" value="5" oninput="updateSlider('anxiety')">
+                            <div class="slider-labels">
+                                <span>穏やか</span>
+                                <span>非常に不安</span>
+                            </div>
+                            <div class="slider-value" id="anxiety-value">5</div>
+                        </div>
+                    </div>
+
+                    <textarea class="worry-input" id="checkin-note" placeholder="今日の一言メモ（任意）" style="min-height: 80px;"></textarea>
+
+                    <button class="btn" onclick="saveCheckin()">💾 記録を保存</button>
+
+                    <div style="margin-top: 25px;">
+                        <h4 style="color: #333; margin-bottom: 15px;">📅 過去の記録</h4>
+                        <div id="history-list">
+                            <!-- 履歴がここに表示される -->
+                            <p style="color: #999; text-align: center;">まだ記録がありません</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- タブ4: ガイド -->
+                <div class="tab-content" id="tab-guide">
+                    <h3 style="margin-bottom: 20px; color: #333;">起業家のメンタルヘルスガイド</h3>
+
+                    <div style="background: #f0fffd; border-radius: 16px; padding: 20px; margin-bottom: 20px;">
+                        <h4 style="color: #44A08D; margin-bottom: 15px;">📊 起業家のメンタル統計</h4>
+                        <ul style="padding-left: 20px; color: #555; line-height: 1.8;">
+                            <li>起業家の<strong>72%</strong>がメンタルヘルスの問題を経験</li>
+                            <li>一般の人より<strong>うつ病リスクが2倍</strong></li>
+                            <li>しかし<strong>81%</strong>が誰にも相談していない</li>
+                        </ul>
+                        <p style="color: #44A08D; font-weight: bold; margin-top: 15px;">→ あなただけではありません。</p>
+                    </div>
+
+                    <div class="guide-section">
+                        <h3>⚠️ 要注意サイン</h3>
+                        <p style="color: #666; margin-bottom: 15px;">以下の症状が2週間以上続く場合は、専門家への相談を検討してください。</p>
+                        <ul class="warning-signs">
+                            <li><span class="icon">😴</span> 睡眠障害（眠れない/眠りすぎる）</li>
+                            <li><span class="icon">🍽️</span> 食欲の大きな変化</li>
+                            <li><span class="icon">😔</span> 何をしても楽しくない</li>
+                            <li><span class="icon">🔄</span> 同じ不安が頭から離れない</li>
+                            <li><span class="icon">💢</span> 些細なことで怒りが爆発する</li>
+                            <li><span class="icon">🚫</span> 「消えたい」という気持ち</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #e8f5e9; border-radius: 16px; padding: 20px; margin-top: 20px;">
+                        <h4 style="color: #2e7d32; margin-bottom: 15px;">🆘 相談先リスト</h4>
+                        <ul style="padding-left: 20px; color: #555; line-height: 2;">
+                            <li><strong>よりそいホットライン:</strong> 0120-279-338（24時間）</li>
+                            <li><strong>いのちの電話:</strong> 0570-783-556</li>
+                            <li><strong>こころの健康相談統一ダイヤル:</strong> 0570-064-556</li>
+                        </ul>
+                        <p style="color: #2e7d32; margin-top: 15px; font-size: 0.9rem;">
+                            ※ 助けを求めることは、弱さではなく強さです
+                        </p>
+                    </div>
+
+                    <div style="background: #f8f9ff; border-radius: 16px; padding: 20px; margin-top: 20px;">
+                        <h4 style="color: #333; margin-bottom: 15px;">💡 日常でできるセルフケア</h4>
+                        <ul style="padding-left: 20px; color: #555; line-height: 2;">
+                            <li>🚶 1日15分の散歩</li>
+                            <li>📝 3行日記で気持ちを書き出す</li>
+                            <li>🧘 深呼吸を1日3回意識する</li>
+                            <li>👥 週1回は人と話す時間を作る</li>
+                            <li>📵 寝る前1時間はスマホを見ない</li>
+                            <li>☀️ 朝日を浴びる</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div><!-- /main-content -->
+        </div>
+    </div>
+
+    <script>
+        // アクセス制御
+        (function() {
+            const denied = document.getElementById('access-denied');
+            const main = document.getElementById('main-content');
+            const title = document.getElementById('denied-title');
+            const message = document.getElementById('denied-message');
+
+            if (!accessResult.valid) {
+                denied.classList.add('show');
+                main.classList.remove('show');
+                if (accessResult.reason === 'expired') {
+                    title.textContent = '有効期限が切れています';
+                    message.textContent = `このページの有効期限は ${accessResult.expireDate} で終了しました。`;
+                } else {
+                    title.textContent = 'アクセスキーが無効です';
+                    message.textContent = '正しいURLで再度アクセスしてください。';
+                }
+            } else {
+                denied.classList.remove('show');
+                main.classList.add('show');
+                loadHistory();
+            }
+        })();
+
+        // 気分に応じたレスポンス
+        const moodResponses = {
+            great: {
+                title: "😄 素晴らしい調子ですね！",
+                message: "今のポジティブなエネルギーを活かして、チャレンジングな仕事に取り組むのに最適なタイミングです。",
+                tips: [
+                    "この調子を維持するために、今日うまくいったことを3つ書き留めておきましょう",
+                    "エネルギーが高い時にこそ、難しい決断や創造的な作業を",
+                    "周りの人にもポジティブな影響を与えられる日です"
+                ]
+            },
+            good: {
+                title: "🙂 良い状態ですね",
+                message: "安定した気持ちで過ごせているようです。このペースを大切にしましょう。",
+                tips: [
+                    "今日の優先事項を3つに絞って、着実に進めましょう",
+                    "適度な休憩を取りながら、持続可能なペースで",
+                    "感謝できることを1つ見つけてみてください"
+                ]
+            },
+            normal: {
+                title: "😐 普通の状態ですね",
+                message: "特別良くも悪くもない日。それも大切な日常の一部です。",
+                tips: [
+                    "小さな達成感を積み重ねることで、気分が上向くことも",
+                    "体を動かしてみると、気分転換になります",
+                    "無理せず、今できることに集中しましょう"
+                ]
+            },
+            anxious: {
+                title: "😰 不安を感じているんですね",
+                message: "起業には不安がつきもの。その不安は「真剣に取り組んでいる証拠」でもあります。",
+                tips: [
+                    "不安の正体を紙に書き出してみましょう。意外と小さく見えることも",
+                    "「最悪の場合どうなる？」を具体的に考えると、対策が見えてきます",
+                    "今この瞬間、深呼吸を3回してみてください",
+                    "一人で抱え込まず、誰かに話してみることも大切です"
+                ]
+            },
+            tired: {
+                title: "😩 お疲れ様です",
+                message: "頑張りすぎていませんか？休むことも、起業家の大切な仕事です。",
+                tips: [
+                    "今日は早めに休む許可を自分に出しましょう",
+                    "「今日やらなくていいこと」を3つ決めて、手放しましょう",
+                    "短い仮眠（15-20分）が効果的なこともあります",
+                    "明日の自分に任せられることは、明日に回してOK"
+                ]
+            },
+            down: {
+                title: "😢 つらい時ですね",
+                message: "今は落ち込んでいても、それは一時的なもの。あなたの価値は変わりません。",
+                tips: [
+                    "無理に前向きになろうとしなくて大丈夫です",
+                    "今日は自分に優しくする日にしましょう",
+                    "好きな音楽を聴く、お風呂に入る、など小さな心地よさを",
+                    "この状態が2週間以上続くなら、専門家への相談も検討してください",
+                    "「ガイド」タブに相談先リストがあります"
+                ]
+            }
+        };
+
+        // 認知の歪みパターン
+        const cognitiveDistortions = [
+            {
+                name: "全か無か思考",
+                pattern: /失敗|うまくいかない|ダメ|できない|無理/,
+                description: "物事を白か黒かで判断し、中間がない考え方",
+                reframe: "完璧でなくても、「80点」で十分なこともあります。小さな成功も認めましょう。"
+            },
+            {
+                name: "過度の一般化",
+                pattern: /いつも|絶対|みんな|誰も|全部/,
+                description: "一度の出来事から「いつもそうだ」と決めつける",
+                reframe: "「今回は」「この場面では」と限定して考えてみましょう。例外はないですか？"
+            },
+            {
+                name: "心のフィルター",
+                pattern: /でも|だって|どうせ|けど/,
+                description: "良いことを無視して、悪いことだけに注目する",
+                reframe: "うまくいったこと、良かったことも同時に思い出してみてください。"
+            },
+            {
+                name: "読心術",
+                pattern: /思われ|見られ|きっと.+だろう|たぶん.+はず/,
+                description: "相手の考えを勝手に推測して決めつける",
+                reframe: "本当にそう思っているか、確認しましたか？案外違うかもしれません。"
+            },
+            {
+                name: "破局的思考",
+                pattern: /最悪|終わり|取り返し|もうダメ/,
+                description: "最悪の結果ばかりを想像してしまう",
+                reframe: "最悪の場合でも、本当に取り返しがつかないですか？具体的に考えると、意外と対処法があるものです。"
+            },
+            {
+                name: "べき思考",
+                pattern: /べき|しなきゃ|しないと|must|ねば/,
+                description: "「〜すべき」と自分を追い詰める",
+                reframe: "「〜したい」「〜できたらいいな」に言い換えてみましょう。義務ではなく選択です。"
+            }
+        ];
+
+        let selectedMood = null;
+        let history = [];
+
+        // タブ切り替え
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // 気分選択
+        function selectMood(element, mood) {
+            document.querySelectorAll('.mood-item').forEach(item => item.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedMood = mood;
+
+            const response = moodResponses[mood];
+            const responseArea = document.getElementById('mood-response');
+
+            responseArea.innerHTML = `
+                <h3>${response.title}</h3>
+                <p>${response.message}</p>
+                <h4 style="color: #44A08D; margin: 15px 0 10px;">💡 おすすめアクション</h4>
+                <ul>
+                    ${response.tips.map(tip => `<li>${tip}</li>`).join('')}
+                </ul>
+            `;
+            responseArea.classList.add('show');
+        }
+
+        // 不安分析
+        function analyzeWorry() {
+            const worry = document.getElementById('worry-input').value.trim();
+            if (!worry) {
+                alert('不安や悩みを入力してください');
+                return;
+            }
+
+            const foundDistortions = cognitiveDistortions.filter(d => d.pattern.test(worry));
+            const responseArea = document.getElementById('worry-response');
+
+            let html = `
+                <h3>🔍 分析結果</h3>
+                <p>あなたの不安を分析しました。まず、書き出してくれたことが素晴らしい第一歩です。</p>
+            `;
+
+            if (foundDistortions.length > 0) {
+                html += `<h4 style="color: #FF6B6B; margin: 20px 0 15px;">⚠️ 見つかった認知の歪み</h4>`;
+                foundDistortions.forEach(d => {
+                    html += `
+                        <div class="distortion-box">
+                            <h4>「${d.name}」の傾向</h4>
+                            <p>${d.description}</p>
+                        </div>
+                        <div class="reframe-box">
+                            <h4>💚 別の視点</h4>
+                            <p>${d.reframe}</p>
+                        </div>
+                        <br>
+                    `;
+                });
+            } else {
+                html += `
+                    <div class="reframe-box">
+                        <h4>💚 振り返りのポイント</h4>
+                        <p>具体的な認知の歪みは見つかりませんでした。ただ、以下の点を考えてみてください：</p>
+                        <ul style="margin-top: 10px;">
+                            <li>この不安は、自分でコントロールできることですか？</li>
+                            <li>最悪の場合、実際にはどうなりますか？</li>
+                            <li>この状況を乗り越えた人はいませんか？</li>
+                            <li>1年後、この不安を覚えていると思いますか？</li>
+                        </ul>
+                    </div>
+                `;
+            }
+
+            html += `
+                <div style="margin-top: 20px; padding: 15px; background: #f8f9ff; border-radius: 10px;">
+                    <p style="font-size: 0.9rem; color: #666;">
+                        💬 <strong>次のステップ:</strong>
+                        この分析を踏まえて、不安を別の言葉で言い換えてみましょう。
+                        または、信頼できる人に話してみることも効果的です。
+                    </p>
+                </div>
+            `;
+
+            responseArea.innerHTML = html;
+            responseArea.classList.add('show');
+        }
+
+        // スライダー更新
+        function updateSlider(type) {
+            const value = document.getElementById(type + '-slider').value;
+            document.getElementById(type + '-value').textContent = value;
+        }
+
+        // チェックイン保存
+        function saveCheckin() {
+            const checkin = {
+                date: new Date().toLocaleDateString('ja-JP'),
+                time: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit' }),
+                mood: document.getElementById('mood-slider').value,
+                energy: document.getElementById('energy-slider').value,
+                anxiety: document.getElementById('anxiety-slider').value,
+                note: document.getElementById('checkin-note').value
+            };
+
+            history.unshift(checkin);
+            if (history.length > 7) history.pop(); // 直近7日分のみ保持
+
+            localStorage.setItem('mentalcare_history', JSON.stringify(history));
+
+            document.getElementById('checkin-note').value = '';
+            document.getElementById('mood-slider').value = 5;
+            document.getElementById('energy-slider').value = 5;
+            document.getElementById('anxiety-slider').value = 5;
+            updateSlider('mood');
+            updateSlider('energy');
+            updateSlider('anxiety');
+
+            displayHistory();
+            alert('記録を保存しました！');
+        }
+
+        // 履歴読み込み
+        function loadHistory() {
+            const saved = localStorage.getItem('mentalcare_history');
+            if (saved) {
+                history = JSON.parse(saved);
+                displayHistory();
+            }
+        }
+
+        // 履歴表示
+        function displayHistory() {
+            const container = document.getElementById('history-list');
+            if (history.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center;">まだ記録がありません</p>';
+                return;
+            }
+
+            const moodEmojis = ['😢', '😢', '😰', '😰', '😐', '😐', '🙂', '🙂', '😄', '😄'];
+
+            container.innerHTML = history.map(h => `
+                <div class="history-item">
+                    <div class="date">${h.date} ${h.time}</div>
+                    <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                        <span class="mood">${moodEmojis[h.mood - 1]}</span>
+                        <span style="font-size: 0.85rem; color: #666;">
+                            気分: ${h.mood} / エネルギー: ${h.energy} / 不安: ${h.anxiety}
+                        </span>
+                    </div>
+                    ${h.note ? `<div class="note" style="margin-top: 8px;">${h.note}</div>` : ''}
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
